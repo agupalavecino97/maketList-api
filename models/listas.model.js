@@ -12,8 +12,6 @@ var model = {
 };
  
 model.guardarLista = async function(lista, items, callback) {
-    console.log('model.guardar.lista', lista);
-    console.log('model.guardar.items', items);
     if (connection) {
         var verificar_nombre = 'SELECT * FROM lista WHERE eliminado = 0 AND id_usuario = '+ connection.escape(lista.id_usuario) +' AND nombre = ' + connection.escape(lista.nombre);
 		connection.query(verificar_nombre, function(error, result_verificar_nombre) {
@@ -29,18 +27,18 @@ model.guardarLista = async function(lista, items, callback) {
                             //throw error;
                             callback(null, {"error": 'Error al insertar en base de datos.'});
                         } else {
-                            // let itemsInsert = '';
-                            id_lista = result_inert.insertId;
+                            let itemsInsert = '';
+                            let id_lista = result_inert.insertId;
                             items.forEach( item => {
-                                item.id = id_lista
+                                itemsInsert = itemsInsert + '(' + null + ',"' + item.valor + '",' + item.estado + ',' + id_lista + '),';
                             });
-                            console.log(items);
-                            connection.query("INSERT INTO lista-item SET ?", items, function(error, result_inert)  {
+                            itemsInsert = itemsInsert.slice(0, -1);
+                            connection.query("INSERT INTO lista_item (id, valor, estado, id_lista) VALUES " + itemsInsert, function(error, result_inert)  {
                                 if(error) {
-                                    //throw error;
+                                    throw error;
                                     callback(null, {"error": 'Error al insertar en base de datos.'});
                                 } else { 
-                                    callback(null, {"message": 'Lista guardad correctamente.'});
+                                    callback(null, {"data": id_lista});
                                 }
                             });
 

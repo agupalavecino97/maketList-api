@@ -1,7 +1,7 @@
 'use strict'
 
 //modelos
-var model = require('../models/listas');
+var model = require('../models/listas.model');
 
 
 function obtenerListas(req, res) {
@@ -28,16 +28,19 @@ function guardarLista(req, res) {
             id_usuario: req.id_usuario,
             eliminado: 0
     }
-    console.log(data);
     if (params) {
         model.guardarLista(data, params.items, (error, resultado) => {
             if (error) {
                 res.status(500).send({ message: 'Error al Guardar.' });
             } else {
-                if (resultado.message) {
-                    res.status(200).send({message: resultado.message});
+                if (resultado.error) {
+                    res.status(200).send({error: resultado.error});
                 } else {
-                    res.status(200).send({data: resultado});
+                    if (resultado.message) {
+                        res.status(200).send({message: resultado.message});
+                    } else {
+                        res.status(200).send({data: resultado.data});
+                    }
                 }
             }
         }); 

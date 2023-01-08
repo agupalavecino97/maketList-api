@@ -7,7 +7,7 @@ var app = express();
 
 // cargar rutas
 var users_route = require('./routes/users.route');
-
+var listas_route = require('./routes/listas.route');
 
 //cargo los middlewares: se ejecutan antes que las funciones cuando se hace una peticion http
 app.use(bodyParser.urlencoded({extended:false}));
@@ -25,11 +25,6 @@ app.use(bodyParser.json());  // convierte lo que trae la peticion a un objeto js
 
 //configurar rutas base (midleware)
 app.use('/api/users', users_route);
-
-
-//metodo para probar
-app.get('/probando', (req, res) =>{
-    res.status(200).send({message: "Esto es una prueba"});
-});
+app.use('/api/lists', listas_route);
 
 module.exports = app;
