@@ -9,6 +9,6 @@ var api = express.Router();
 api.get('/', autentication.authorization, controller.obtenerListas);
 api.post('/', autentication.authorization, controller.guardarLista);
 api.put('/', autentication.authorization, controller.actualizarLista);
-api.delete('/', autentication.authorization, controller.eliminarLista);
+api.delete('/:id?', autentication.authorization, controller.eliminarLista);
 
 module.exports = api;

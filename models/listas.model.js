@@ -11,6 +11,20 @@ var model = {
     id_usuario: null
 };
  
+model.obtenerListas = async (id_usuario, callback) => {
+    if (connection) {
+        var obtener_listas = 'SELECT * FROM lista WHERE eliminado = 0 AND id_usuario = '+ connection.escape(id_usuario);
+		connection.query(obtener_listas, (error, res) => {
+            if (error) {
+                callback( null, {'error': 'Error al obtener listas'});
+            } else {
+                callback( null, {'data': res});
+            }
+        });
+
+    }
+}
+
 model.guardarLista = async function(lista, items, callback) {
     if (connection) {
         var verificar_nombre = 'SELECT * FROM lista WHERE eliminado = 0 AND id_usuario = '+ connection.escape(lista.id_usuario) +' AND nombre = ' + connection.escape(lista.nombre);
@@ -50,5 +64,27 @@ model.guardarLista = async function(lista, items, callback) {
     }
 };
 
+model.eliminarLista = async (id, callback) => {
+    if (connection) {
+        var eliminar_lista = 'DELETE FROM lista WHERE id = '+ connection.escape(id);
+		connection.query(eliminar_lista, (error, res) => {
+            if (error) {
+                callback( null, {'error': 'Error al eliminar lista'});
+            } else {
+                var eliminar_items = 'DELETE FROM lista_item WHERE id_lista = '+ connection.escape(id);
+                connection.query(eliminar_items, (error, res) => {
+                    if (error) {
+                        callback( null, {'error': 'Error al eliminar items'});      
+                    } else {
+                        callback( null, {'message': 'Eliminado Correctamente'});
+
+                    }
+                });
+
+            }
+        });
+
+    }
+}
 
 module.exports = model;

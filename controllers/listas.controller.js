@@ -5,11 +5,15 @@ var model = require('../models/listas.model');
 
 
 function obtenerListas(req, res) {
-    model.obtenerListas(req.id_usuario, function (error, resultado) {
+    model.obtenerListas(req.id_usuario, function (error, response) {
         if (error) {
-            res.status(500).send({ message: 'Error al Obtener todos.' });
+            res.status(500).send({ error: error });
         } else {
-            res.status(200).send(resultado);
+            if (response.error) {
+                res.status(200).send({ error: response.error });
+            } else {
+                res.status(200).send({ data: response.data });
+            }
         }
     });
 }
@@ -17,7 +21,6 @@ function obtenerListas(req, res) {
 
 function guardarLista(req, res) {
     let params = req.body; 
-    // //console.log('guardarFormaPago-Controller: ');//console.log(params); 
     let date = new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60000)).toISOString().split('T')[0];
     let data = {
             id: null,
@@ -51,7 +54,6 @@ function guardarLista(req, res) {
 
 function actualizarLista(req, res) {
     var params = req.body;
-    // //console.log('actualizarFormaPago', params);
     if (params) {
         model.actualizarLista(params, (error, resultado) => {
             if (error) {
@@ -70,16 +72,16 @@ function actualizarLista(req, res) {
 }
 
 function eliminarLista(req, res) {
-    var id = params.id;
+    var id = req.params.id;
     if (id) {
         model.eliminarLista(id, (error, resultado)=>{
             if (error) { 
                 res.status(500).send({message: "Error al eliminar."});
             } else {
-                if (resultado.message) {
-                    res.status(200).send({message: resultado.message});
+                if (resultado.error) {
+                    res.status(200).send({error: resultado.error});
                 } else {
-                    res.status(200).send({data: resultado});
+                    res.status(200).send({message: resultado.message});
                 }
             }
         });
