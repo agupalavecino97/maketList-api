@@ -1,7 +1,7 @@
 'use strict'
 
 //modelos
-var model = require('../models/listas.model');
+let model = require('../models/listas.model');
 
 
 function obtenerListas(req, res) {
@@ -53,16 +53,18 @@ function guardarLista(req, res) {
 }
 
 function actualizarLista(req, res) {
-    var params = req.body;
-    if (params) {
-        model.actualizarLista(params, (error, resultado) => {
+    let id = req.params.id;
+    let data = req.body;
+    console.log(data)
+    if (data) {
+        model.actualizarLista(data, id, (error, resultado) => {
             if (error) {
                 res.status(500).send({ message: 'Error al actualizar.' });
             } else {
-                if (resultado.message) {
-                    res.status(200).send({message: resultado.message});
+                if (resultado.error) {
+                    res.status(200).send({error: resultado.error});
                 } else {
-                    res.status(200).send({data: resultado});
+                    res.status(200).send({message: resultado.message});
                 }
             }
         });
@@ -72,7 +74,7 @@ function actualizarLista(req, res) {
 }
 
 function eliminarLista(req, res) {
-    var id = req.params.id;
+    let id = req.params.id;
     if (id) {
         model.eliminarLista(id, (error, resultado)=>{
             if (error) { 
@@ -90,10 +92,25 @@ function eliminarLista(req, res) {
     }
 }
 
+function obtenerDetalleLista(req, res) {
+    model.obtenerDetalleLista(req.params.id, function (error, response) {
+        if (error) {
+            res.status(500).send({ error: error });
+        } else {
+            if (response.error) {
+                res.status(200).send({ error: response.error });
+            } else {
+                res.status(200).send({ data: response.data });
+            }
+        }
+    });
+}
+
 //exporto los metodos en forma de un objeto
 module.exports={
     obtenerListas,
     guardarLista,
     actualizarLista,
-    eliminarLista
+    eliminarLista,
+    obtenerDetalleLista
 }

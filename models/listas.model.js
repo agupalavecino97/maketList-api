@@ -1,8 +1,8 @@
 "use strict";
-var connection = require("../connection");
+let connection = require("../connection");
 
 
-var model = {
+let model = {
     id: null,
     nombre: null,
     precio: null,
@@ -13,7 +13,7 @@ var model = {
  
 model.obtenerListas = async (id_usuario, callback) => {
     if (connection) {
-        var obtener_listas = 'SELECT * FROM lista WHERE eliminado = 0 AND id_usuario = '+ connection.escape(id_usuario);
+        let obtener_listas = 'SELECT * FROM lista WHERE eliminado = 0 AND id_usuario = '+ connection.escape(id_usuario);
 		connection.query(obtener_listas, (error, res) => {
             if (error) {
                 callback( null, {'error': 'Error al obtener listas'});
@@ -27,7 +27,7 @@ model.obtenerListas = async (id_usuario, callback) => {
 
 model.guardarLista = async function(lista, items, callback) {
     if (connection) {
-        var verificar_nombre = 'SELECT * FROM lista WHERE eliminado = 0 AND id_usuario = '+ connection.escape(lista.id_usuario) +' AND nombre = ' + connection.escape(lista.nombre);
+        let verificar_nombre = 'SELECT * FROM lista WHERE eliminado = 0 AND id_usuario = '+ connection.escape(lista.id_usuario) +' AND nombre = ' + connection.escape(lista.nombre);
 		connection.query(verificar_nombre, function(error, result_verificar_nombre) {
 			if(error) {				
                 // throw error; 
@@ -66,12 +66,12 @@ model.guardarLista = async function(lista, items, callback) {
 
 model.eliminarLista = async (id, callback) => {
     if (connection) {
-        var eliminar_lista = 'DELETE FROM lista WHERE id = '+ connection.escape(id);
+        let eliminar_lista = 'DELETE FROM lista WHERE id = '+ connection.escape(id);
 		connection.query(eliminar_lista, (error, res) => {
             if (error) {
                 callback( null, {'error': 'Error al eliminar lista'});
             } else {
-                var eliminar_items = 'DELETE FROM lista_item WHERE id_lista = '+ connection.escape(id);
+                let eliminar_items = 'DELETE FROM lista_item WHERE id_lista = '+ connection.escape(id);
                 connection.query(eliminar_items, (error, res) => {
                     if (error) {
                         callback( null, {'error': 'Error al eliminar items'});      
@@ -86,5 +86,50 @@ model.eliminarLista = async (id, callback) => {
 
     }
 }
+
+model.obtenerDetalleLista = async (id, callback) => {
+    if (connection) {
+        let obtener_detalle_lista = 'SELECT * FROM lista_item WHERE id_lista = '+ connection.escape(id);
+		connection.query(obtener_detalle_lista, (error, res) => {
+            if (error) {
+                callback( null, {'error': 'Error al obtener listas'});
+            } else {
+                callback( null, {'data': res});
+            }
+        });
+
+    }
+}
+
+model.actualizarLista = async function(items, id_lista, callback) {
+    if (connection) {
+        let itemsInsert = '';
+        items.forEach( item => {
+            if (item.id_lista == null) {
+                itemsInsert = itemsInsert + '(' + null + ',"' + item.valor + '",' + item.estado + ',' + id_lista + '),';
+            } else {
+                connection.query("UPDATE lista_item SET estado = " + item.estado + " WHERE id = " + item.id , function(error, result_inert)  {
+                    if(error) {
+                        callback(null, {"error": 'Error al actualizar base de datos.'});
+                    }
+                })
+
+            }
+        });
+        if (itemsInsert.length) {
+            itemsInsert = itemsInsert.slice(0, -1);
+            connection.query("INSERT INTO lista_item (id, valor, estado, id_lista) VALUES " + itemsInsert, function(error, result_inert)  {
+                if(error) {
+                    callback(null, {"error": 'Error al insertar en base de datos.'});
+                } else {
+                    callback(null, {"message": "Lista actualizada correctamente"});
+                }
+            });
+        } else {
+            callback(null, {"message": "Lista actualizada correctamente"});
+        }
+        
+    }
+};
 
 module.exports = model;
