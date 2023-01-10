@@ -54,10 +54,10 @@ function guardarLista(req, res) {
 
 function actualizarLista(req, res) {
     let id = req.params.id;
-    let data = req.body;
-    console.log(data)
-    if (data) {
-        model.actualizarLista(data, id, (error, resultado) => {
+    let items = req.body.items;
+    let ids = req.body.idItemasDelete;
+    if (items) {
+        model.actualizarLista(items, ids, id, (error, resultado) => {
             if (error) {
                 res.status(500).send({ message: 'Error al actualizar.' });
             } else {

@@ -101,8 +101,17 @@ model.obtenerDetalleLista = async (id, callback) => {
     }
 }
 
-model.actualizarLista = async function(items, id_lista, callback) {
+model.actualizarLista = async function(items, ids, id_lista, callback) {
     if (connection) {
+        if (ids.length > 0) {
+            let idsToDelete = ids.join(', ');
+            connection.query('DELETE FROM lista_item WHERE id IN ('+ idsToDelete + ')', function (error, res) {
+                if(error) {
+                    throw error;
+                    callback(null, {"error": 'Error al actualizar base de datos.'});
+                }
+            });
+        }
         let itemsInsert = '';
         items.forEach( item => {
             if (item.id_lista == null) {
@@ -110,6 +119,7 @@ model.actualizarLista = async function(items, id_lista, callback) {
             } else {
                 connection.query("UPDATE lista_item SET estado = " + item.estado + " WHERE id = " + item.id , function(error, result_inert)  {
                     if(error) {
+                        throw error;
                         callback(null, {"error": 'Error al actualizar base de datos.'});
                     }
                 })
@@ -120,6 +130,7 @@ model.actualizarLista = async function(items, id_lista, callback) {
             itemsInsert = itemsInsert.slice(0, -1);
             connection.query("INSERT INTO lista_item (id, valor, estado, id_lista) VALUES " + itemsInsert, function(error, result_inert)  {
                 if(error) {
+                    throw error;s                    
                     callback(null, {"error": 'Error al insertar en base de datos.'});
                 } else {
                     callback(null, {"message": "Lista actualizada correctamente"});

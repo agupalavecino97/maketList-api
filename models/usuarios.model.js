@@ -14,20 +14,19 @@ var model = {
 };
  
 model.login = async function(datos, callback) {
-    console.log('model.login.data', datos);
     if (connection) {
         var select_usuario = "SELECT * FROM usuario WHERE email = " + connection.escape(datos.email);
         connection.query(select_usuario, function(error, result_select_usuario) {
             if (result_select_usuario.length == 0) {
                 callback(null, { error: "Email o contraseña incorrectos" });
             } else {
-                    console.log(result_select_usuario)
                     let usuario = result_select_usuario[0];
                     if (bcrypt.compareSync(datos.password, usuario.password)  || bcrypt.compareSync("'"+datos.password+"'", usuario.password)){                     
-                        const expiresIn = 6 * 60 * 60;
-                        const accessToken = jwt.sign({ id: usuario.id }, SECRET_KEY, { expiresIn: expiresIn });
+                        // const expiresIn = 6 * 60 * 60;
+                        // const accessToken = jwt.sign({ id: usuario.id }, SECRET_KEY, { expiresIn: expiresIn });
+                        const accessToken = jwt.sign({ id: usuario.id }, SECRET_KEY);
                         let user = usuario.nombre;
-                        callback(null, {expiresIn, accessToken, user});   
+                        callback(null, { accessToken, user});   
                     } else {
                         callback(null, { error: "Email o contraseña incorrectos" });
                     }
@@ -38,7 +37,6 @@ model.login = async function(datos, callback) {
 };
 
 model.registro = function(data, callback) {
-    console.log('model.registro.data', data)
     if (connection) {
         connection.query(
             "SELECT usuario.*"+
@@ -49,7 +47,6 @@ model.registro = function(data, callback) {
                     // throw error;
                     callback(null, { error: "Error en consulta SQL" });
                 } else {
-                    console.log(row)
                     if (row.length > 0){
                         callback(null, { error: "El email ingresado ya esta registrado en el sistema, por favor ingrese otro." });
                     }else{
@@ -59,7 +56,6 @@ model.registro = function(data, callback) {
                         let fecha_registro = new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60000)).toISOString().split('T')[0];
                         // let fe = fecha_registro.split('-');
                         // let fr = fe[2]+'/'+fe[1]+'/'+fe[0];
-                        console.log(fe, fr)
                         var insert ="INSERT INTO usuario (email, password, nombre, fecha_registro) " +
                             "VALUES ( '" +
                             data.email +

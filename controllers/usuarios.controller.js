@@ -7,9 +7,7 @@ var model = require('../models/usuarios.model');
 async function login(req, res) {
     var datos = req.body;
     if (datos) { 
-        // //console.log('controlador usuario: ', datos);
         await model.login(datos, function(error, data) {    
-            // //console.log('login: ', error, data);
             if (data.error) {
                 res.status(200).send({error: data.error});
             } else {
@@ -26,9 +24,7 @@ async function login(req, res) {
 async function registro(req, res) {
     var datos = req.body;
     if (datos) {
-        // //console.log('controlador usuario: ', datos);
         await model.registro(datos, function(error, data) {    
-            // console.log('registro: ', data.error);
             if (data.error) {
                 res.status(200).send({error: data.error});
             } else {
