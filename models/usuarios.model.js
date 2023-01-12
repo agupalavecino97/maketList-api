@@ -68,10 +68,12 @@ model.registro = function(data, callback) {
                             "');";
                         connection.query(insert, function(error, result_inert) {
                             if (error) {
-                                throw error;
+                                // throw error;
                                 callback(null, { error: "ERROR INSERT SQL." });
                             } else { 
-                                callback(null, { data: result_inert.insertId });
+                                const accessToken = jwt.sign({ id: usuario.id }, SECRET_KEY);
+                                let user = data.name;
+                                callback(null, { accessToken, user});   
                             }
                         });
                     }
