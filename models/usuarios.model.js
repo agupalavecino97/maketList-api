@@ -60,28 +60,26 @@ model.registro = function (data, callback) {
             // encripto la contraseña
             let pass = bcrypt.hashSync(data.password, bcrypt.genSaltSync(10));
             // guardo el usuario
-            let fecha_registro = new Date(
-              Date.now() - new Date().getTimezoneOffset() * 60000
-            )
+            let fecha_registro = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
               .toISOString()
               .split("T")[0];
             var insert =
               "INSERT INTO usuario (email, password, nombre, fecha_registro) " +
-              "VALUES ( '" +
+              "VALUES ( '"+
               data.email +
               "', '" +
               pass +
               "', '" +
               data.name +
-              "', '" +
+              "', " +
               fecha_registro +
-              "');";
+              ");";
             connection.query(insert, function (error, result_inert) {
               if (error) {
-                // throw error;
+                throw error;
                 callback(null, { error: "ERROR INSERT SQL." });
               } else {
-                const accessToken = jwt.sign({ id: usuario.id }, SECRET_KEY);
+                const accessToken = jwt.sign({ id: result_inert.insertId }, SECRET_KEY);
                 let user = data.name;
                 callback(null, { accessToken, user });
               }
