@@ -1,7 +1,8 @@
 "use stric"; // usa los requisitos de los navegadores que utlicen HTTP
 
 var app = require("./app");
-var port = process.env.PORT || 3789; //toma una variabl de entorno, en este caso port
+
+var port = process.env.PORT || 8080; //toma una variabl de entorno, en este caso port
 var connection = require("./connection");
 
 connection.connect(function (error) {
